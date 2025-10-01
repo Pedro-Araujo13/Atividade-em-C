@@ -1,0 +1,4 @@
+Resultado da eleição:
+Candidato 1: 0 votos
+Candidato 2: 0 votos
+Candidato 3: 0 votos

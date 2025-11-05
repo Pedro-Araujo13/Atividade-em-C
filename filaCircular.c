@@ -55,7 +55,7 @@ void exibirFila(Fila *f) {
         printf("Fila: ");
         int i = f->frente;
         for (int j = 0; j < f->tamanho; j++) {  
-            printf("%d ", f->itens[i]);
+            printf("%d -> ", f->itens[i]);
             i = (i + 1) % TAM; 
         }
         printf("\n");

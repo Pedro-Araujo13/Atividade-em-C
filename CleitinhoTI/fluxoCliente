@@ -1,0 +1,32 @@
+
+#PROBLEMAS
+1- Perdeu Contato de Cliente
+2- Esqueceu de Cobrar por um Serviço
+3- Perdeu uma peça que o cliente deixou lá
+
+#DEMANDAS DO CLIENTE
+
+4- Precisa anotar o nome dele
+5- Precisa ter controle de cada conserto
+
+    Solução: Cadastro de Cliente, com:
+    Nome:
+    Telefone:
+    Email:
+        Equipamento/Peça em conserto:
+        Qual o problema da Peça:
+        Valor do serviço:
+        Status: Não-Iniciado/Em processo/Finalizado
+
+
+6- As vezes as peças acabam e ele só descobre na hora
+    Solução: Controle de estoque, no qual Cleitinho coloca quais materiais disponíveis no estoque ele tem, e a sua quantidade, e o procedimento pra adicionar (comprou mais peças) ou remover (usou alguma peça)
+
+7- Precisa saber a situação atual de determinado cliente
+
+#NECESSIDADES DO CÓDIGO
+
+8- Salvar em arquivos
+9- Tratamento de erros
+10- CRUD
+Create, Read, Update, Delete

@@ -2,10 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+
+
+    
+
+
+
+
 int main(){
     setlocale(LC_ALL, "");
-    int opcao;
-    char nome[50], email[25], tel[15], linha[512], usuario[50], pecaTipo[50], servicoTipo[50], status[20];
+    int opcao, valor;
+    char nome[50], email[25], tel[15], linha[512], usuario[50], pecaTipo[50], servicoTipo[50], urgencia[20], data[15];
     char cpf [12];
    
 do{
@@ -15,7 +22,8 @@ do{
     printf("2- Listar os Clientes\n");
     printf("3- Atualizar dados\n");
     printf("4- Deletar\n");
-    printf("5- Fechar Sistema:");
+    printf("5- Faturamento\n");
+    printf("6- Fechar Sistema:");
     printf("\nOpcao: ");
     if (scanf(" %d", &opcao) != 1){ // se scanf devolver algum outro número além de 1 (comando funcionou normalmente), entra num bloco de tratamento de erro
        while(getchar() != '\n'); //Limpa o chacê  da variável até não sobrar nada 
@@ -56,10 +64,16 @@ do{
             printf("Insira o tipo de Servico: ");
             scanf(" %[^\n]", servicoTipo);
 
-            printf("Insira o status(Não Iniciado - Em processo - Finalizado):");
-            scanf(" %[^\n]", status);
+            printf("Insira o valor cobrado pelo serviço: ");
+            scanf("%d", &valor);
 
-            fprintf(arquivo, "%s;%s;%s;%s;%s;%s;%s\n", nome, email, cpf, tel, pecaTipo, servicoTipo, status);
+            printf("Insira a data de entrada da peça: ");
+            scanf(" %[^\n]", data);
+
+            printf("Insira a urgencia:");
+            scanf(" %[^\n]", urgencia);
+
+            fprintf(arquivo, "%s;%s;%s;%s;%s;%s;%d;%s;%s\n", nome, email, cpf, tel, pecaTipo, servicoTipo, valor, data, urgencia);
             printf("Arquivo salvo!\n");
             
             fclose(arquivo);
@@ -181,13 +195,14 @@ do{
             }
             typedef struct{
                     char nomeArchive[50], emailArchive[50], cpfArchive[15], telArchive[12],
-                    pecaTipoArchive[50], servicoTipoArchive[50], statusArchive[25];
+                    pecaTipoArchive[50], servicoTipoArchive[50], dataArchive[15], urgenciaArchive[25];
+                    int valorArchive;
             } Dados; //struct para facilitar o armazenamento de dados no arquivo
 
             FILE *temporario; //cria um arquivo temporário para fazer alterações
             Dados dados;
             char novoValor[100];
-            int encontrado = 0, opcaoChange;
+            int encontrado = 0, opcaoChange, valorNovo;
 
             rewind(arquivo); // toda vez que o arquivo é lido, ele 'termina de ler' no final, então rewind(arquivo) prepara pra próxima leitura
             char linhaEcontrada[256];
@@ -222,7 +237,13 @@ do{
             if (token != NULL) strcpy(dados.servicoTipoArchive, token);
             
             token = strtok(NULL, ";");
-            if (token != NULL) strcpy(dados.statusArchive, token);
+            if (token != NULL) dados.valorArchive = (int)strtol(token, NULL, 10);
+
+            token = strtok(NULL, ";");
+            if (token != NULL) strcpy(dados.dataArchive, token);
+            
+            token = strtok(NULL, ";");
+            if (token != NULL) strcpy(dados.urgenciaArchive, token);
             
             int corresponde = 0;
             //checa se o valor buscado é igual ao no arquivo
@@ -244,7 +265,9 @@ do{
                     printf("4 - Tel: %s\n", dados.telArchive);
                     printf("5 - Tipo de Peça: %s\n", dados.pecaTipoArchive);
                     printf("6 - Tipo de serviço: %s\n", dados.servicoTipoArchive);
-                    printf("7 - Status: %s\n", dados.statusArchive);
+                    printf("7 - Valor: %d\n", dados.valorArchive);
+                    printf("8 - Data de entrada: %s\n", dados.dataArchive);
+                    printf("9 - urgencia: %s\n", dados.urgenciaArchive);
             }
         }
 
@@ -261,7 +284,9 @@ do{
                     printf("4 - Telefone\n");
                     printf("5 - Tipo de Peça\n");
                     printf("6 - Tipo de serviço\n");
-                    printf("7 - Status\n");
+                    printf("7 - Valor\n");
+                    printf("8 - Data de entrada\n");
+                    printf("9 - urgencia\n");
           
                     printf("Opção: ");
                         scanf(" %d", &opcaoChange);
@@ -314,11 +339,24 @@ do{
                                 printf("Tipo de serviço atualizado com sucesso!\n");
                                 break;
                             case 7:
-                               printf("Insira o novo status: ");
+                                printf("Insira o novo valor: ");
+                                scanf(" %d", &valorNovo);
+                                dados.valorArchive = valorNovo;
+                                printf("Valor atualizado com sucesso!\n");
+                                break;
+                            case 8:
+                               printf("Insira a nova data de entrada: ");
                                 fgets(novoValor, sizeof(novoValor), stdin);
                                 novoValor[strcspn(novoValor, "\n")] = '\0';
-                                strcpy(dados.statusArchive, novoValor);
-                                printf("Status atualizado com sucesso!\n");
+                                strcpy(dados.dataArchive, novoValor);
+                                printf("Data atualizado com sucesso!\n");
+                                break;
+                            case 9:
+                               printf("Insira a nova urgência: ");
+                                fgets(novoValor, sizeof(novoValor), stdin);
+                                novoValor[strcspn(novoValor, "\n")] = '\0';
+                                strcpy(dados.dataArchive, novoValor);
+                                printf("Urgência atualizada com sucesso!\n");
                                 break;
 
                             default:
@@ -367,8 +405,8 @@ do{
                         }
 
                         if (ehORegistro && !atualizado){
-                             fprintf(temporario, "%s;%s;%s;%s;%s;%s;%s\n", dados.nomeArchive, dados.emailArchive, dados.cpfArchive, dados.telArchive,
-                                dados.pecaTipoArchive, dados.servicoTipoArchive, dados.statusArchive);
+                             fprintf(temporario, "%s;%s;%s;%s;%s;%s;%d;%s;%s\n", dados.nomeArchive, dados.emailArchive, dados.cpfArchive, dados.telArchive,
+                                dados.pecaTipoArchive, dados.servicoTipoArchive, dados.valorArchive, dados.dataArchive, dados.urgenciaArchive);
                             atualizado = 1;
                             printf("\nRegistro atualizado no arquivo\n"); 
 
@@ -393,15 +431,153 @@ do{
                     //Falta criar a parte de estoque pra poder criar Atualizar/Editar estoque
                     //O que deve ser feito?
                     //1. A opcao de remover itens ( decrementar itens / quais itens foram usados)
+                    int removerAdicionar;
+                    printf("(1) Adicionar\n(2) Remover\n");
+                    scanf(" %d", &removerAdicionar);
+
+                    if (removerAdicionar == 1){
+                        typedef struct {
+                            char nome[50];
+                            int quantidade;
+                        }Produto;
+
+                        FILE *estoque = fopen("estoque.csv", "r");
+                        FILE *temp = fopen("temp.csv", "w");
+
+                        Produto p;
+                        char nomeBusca[50];
+                        int quantidadeAdd;
+                        int encontrado = 0;
+
+                        if (estoque == NULL){
+
+                            estoque = fopen("estoque.csv", "w");
+                            fclose(estoque);
+                            estoque = fopen("estoque.csv", "r");
+                        }
+                        getchar();
+                        printf("Nome do produto que você deseja adicionar: ");
+                        fgets(nomeBusca, sizeof(nomeBusca), stdin);
+                        nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
+
+                        printf("\nQuantidade a adicionar: ");
+                        scanf("%d", &quantidadeAdd);
+                        getchar();
+
+                        char linha[256];
+                        while (fgets(linha, sizeof(linha), estoque)){
+                            sscanf(linha, "%49[^;];%d", p.nome, &p.quantidade);
+
+                            if (strcmp(p.nome,  nomeBusca) == 0 ){
+                                p.quantidade += quantidadeAdd;
+                                encontrado = 1;     
+
+                            }
+                            fprintf(temp, "%s;%d\n", p.nome, p.quantidade);
+                        }
+                        if (!encontrado){
+                            fprintf(temp, "%s;%d\n", nomeBusca, quantidadeAdd);
+                        }
+
+                        fclose(estoque);
+                        fclose(temp);
+                        remove("estoque.csv");
+                        rename("temp.csv", "estoque.csv");
+
+                        printf("Produto alterado com sucesso!\n");
+                                        }
+                                    
                     //2. A opcao de adicionar itens (quais itens foram comprados, obs: se não existir, adicionar, se existir incrementar o contador)
-                }
+                    if (removerAdicionar == 2){
+                        FILE *estoque = fopen("estoque.csv", "r");
+                        FILE *temp = fopen("temp.csv", "w");
+                        typedef struct {
+                            char nome[50];
+                            int quantidade;
+                        }Produto;
 
-            break;
-        
+                        Produto p;
+                        char nomeBusca[50];
+                        int quantidadeAdd;
+                        int encontrado = 0;
+
+                        if (estoque == NULL){
+
+                            estoque = fopen("estoque.csv", "w");
+                            fclose(estoque);
+                            estoque = fopen("estoque.csv", "r");
+                        }
+                        
+                        getchar();
+                        printf("Nome do produto que você deseja remover: ");
+                        fgets(nomeBusca, sizeof(nomeBusca), stdin);
+                        nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
+
+                        printf("\nQuantidade a remover: ");
+                        scanf("%d", &quantidadeAdd);
+                        getchar();
+
+                        char linha[256];
+                        while (fgets(linha, sizeof(linha), estoque)){
+                            sscanf(linha, "%49[^;];%d", p.nome, &p.quantidade);
+
+                            if (strcmp(p.nome,  nomeBusca) == 0 ){
+                                p.quantidade -= quantidadeAdd;
+                                encontrado = 1;     
+
+                            }
+                            fprintf(temp, "%s;%d\n", p.nome, p.quantidade);
+                        }
+                        if (!encontrado){
+                            fprintf(temp, "%s;%d\n", nomeBusca, quantidadeAdd);
+                        }
+
+                        fclose(estoque);
+                        fclose(temp);
+                        remove("estoque.csv");
+                        rename("temp.csv", "estoque.csv");
+
+                        printf("Produto alterado com sucesso!\n");
+                                        }
+                                    }
+
+                        break;
+                                   
         case 4:
-            //Deletar
+            char pessoaRemover[50];
+            printf("Insira o nome do cliente que você deseja deletar: ");
+            getchar();
+            fgets(pessoaRemover, sizeof(pessoaRemover), stdin);
+            pessoaRemover[strcspn(pessoaRemover, "\n")] = '\0';
 
+            arquivo = fopen("dados.csv", "r");
+            FILE *temp = fopen("temp.csv", "w");
+            while (fgets(linha, sizeof(linha), arquivo)) {
+
+                char nome[50];
+                char linhaCopia[256];
+
+                strcpy(linhaCopia, linha);  // Para preservar a linha original
+
+                // Pega só o nome (primeira coluna)
+                sscanf(linhaCopia, "%[^;]", nome);
+
+                // Se o nome NÃO é o que queremos remover → copia linha para temp
+                if (strcmp(nome, pessoaRemover) != 0) {
+                    fputs(linha, temp);  // Escreve linha como ela é
+                }
+            }
+
+            printf("\nUsuário deletado com sucesso!\n");
+
+            fclose(arquivo);
+            fclose(temp);
+            remove("dados.csv");
+            rename("temp.csv", "dados.csv");
+            break;
         case 5:
+
+        case 6:
             printf("Encerrando sistema...");
 
         default:
@@ -409,5 +585,5 @@ do{
 
 
     }
-}while(opcao!=5);
+}while(opcao!=6);
 }

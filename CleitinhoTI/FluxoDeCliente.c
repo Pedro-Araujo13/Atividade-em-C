@@ -67,7 +67,7 @@ do{
             printf("Insira o valor cobrado pelo serviço: ");
             scanf("%d", &valor);
 
-            printf("Insira a data de entrada da peça: ");
+            printf("Insira a data de entrada da peça (no formato DD/MM/AA): ");
             scanf(" %[^\n]", data);
 
             printf("Insira a urgencia:");
@@ -576,7 +576,42 @@ do{
             rename("temp.csv", "dados.csv");
             break;
         case 5:
+            char linha[100];
+            char mesDesejado[3];
+            int faturamentoTotal = 0;
 
+            getchar();
+            printf("Digite o mês desejado \n01- Janeiro\n02- Fevereiro \n03- Março \n04- Abril \n05- Maio \n06- Junho \n07- Julho \n08- Agosto \n09- Setembro \n10- Outubro \n11- Novembro \n12- Dezembro \nOpcao: ");
+            fgets(mesDesejado, sizeof(mesDesejado), stdin);
+            mesDesejado[strcspn(mesDesejado, "\n")] = '\0';
+
+            FILE *moneyArchive = fopen("dados.csv", "r");
+
+            while (fgets(linha, sizeof(linha), moneyArchive)) {
+                char data[15], faturamentoStr[20];
+                int faturamento;
+
+                // Separa data e faturamento da linha
+                sscanf(linha, "%*[^;];%*[^;];%*[^;];%*[^;];%*[^;];%*[^;];%[^;];%[^;]", faturamentoStr, data);
+
+                // Converte faturamento para número
+                faturamento = atoi(faturamentoStr);
+               
+                // Extrai o mês da data
+                char mes[3];
+                sscanf(data, "%*[^/]/%2[^/]/", mes);
+
+                // Verifica se o mês é o desejado
+                if (strcmp(mes, mesDesejado) == 0) {
+                    faturamentoTotal += faturamento;
+                    printf("Data: %s | Faturamento: R$ %d\n", data, faturamento);
+                }
+
+            }
+            printf("Faturamento total no mês %s : %d", mesDesejado, faturamentoTotal);
+            faturamentoTotal = 0;
+            fclose(moneyArchive);
+            break;
         case 6:
             printf("Encerrando sistema...");
 
